@@ -1,0 +1,99 @@
+"""Defines a class and methods for evaluating 1D quantum potentials.
+"""
+class Potential(object):
+    """ Represents a 1D quantum Potential.
+
+    Args:
+        potcfg (str): path ot the potential configuration file.
+    
+    Attributes:
+        filepath (str): absolute bath to the file that this potential represents.
+        params (dict): keys are parameter names; values are python-evaluated objects.
+        regions (dict): keys are a tuple (`float`, `float`) that specify the start and end
+        of the region; values are either functions or variables to define the potential's value
+        in that region.
+
+    Examples:
+        >>> from basis.potential import Potential
+        >>> import numpy as np
+        >>> x = np.linspace(-2, 2, 100)
+        >>> pot = Potential("sho.cfg")
+        >>> V = pot(x)
+    """
+    def __init__(self, potcfg):
+        from os import path
+        self.filepath = path.abspath(path.expanduser(potcfg))
+        self.params = {}
+        self.regions = {}
+
+    def __call__(self, value):
+        """Evaluates the potential for the given value(s).
+
+        Args:
+            value (numpy.ndarray or float): where to evaluate
+        """
+        for xi,xf in self.regions:
+            if value >= xi and value < xf:
+                function = self.regions[(xi,xf)]
+                if hasattr(function, "__call__"): # If it was a lamda function, call it
+                    return function(value) 
+                else: # Otherwise it was just a specified value, return that value
+                    return function
+        else: # If we didn't return during the loops, then this is the default thing to return
+            return 0.
+        
+    def __mul__(self, value):
+        """Increases the strength of the potential by factor given by `value`.
+
+        Args:
+            value (float): how much to multiply by
+        """
+        #Do I want to overwrite the strength of the potential, or return a new instance of
+        #Potential?
+        pass
+    
+    def _parse_params(self, parser):
+        """Extracts the potential parameters from the specified config parser.
+
+        Args:
+            parser (ConfigParser): instance of configuration file parser
+        """
+        if parser.has_section("parameters"):
+            for param, svalue in parser.items("parameters"):
+                self.params[param] = eval(svalue)
+
+
+    def _parse_regions(self, parser):
+        """Parses the potential's region specifications from config.
+
+        Args:
+            parser (ConfigParser): instance of configuration file parser.
+        """
+        if not parser.has_section("regions"):
+            raise ValueError("[regions] is required to define a potential.")
+
+        for i, spec in parser.items("regions"):
+            domain, sfunc = spec.split('|')
+            if "numpy" in sfunc:
+                import numpy as np
+                self.params["numpy"] = np
+            xi, xf = eval(domain, globals=self.params)
+            function = eval(sfunc)
+            self.regions[(xi,xf)] = function
+    def _parse_config(self):
+        """Parses the potential configuration file to initialize the
+        parameters and function call.
+        """
+        try:
+            from ConfigParser import ConfigParser
+        except ImportError:
+            from configparser import ConfigParser
+
+        parser = ConfigParser()
+        with open(self.filepath) as f:
+            parser.readfp(f)
+
+        self._parse_params(parser)
+        self._parse_regions(parser)
+        
+
