@@ -30,6 +30,15 @@ class Potential(object):
         self.parser = None
         self._parse_config()
 
+    def __gatattr__(self, attr):
+        #if hasattr(self, attr):
+        #    return self.__getattribute__(attr)
+        if attr in self.params:
+            return self.params
+        else:
+            emsg = "{} is not an attribute of Potential objects"
+            raise AttributeError(emsg.format(attr))
+
     def __call__(self, value):
         """Evaluates the potential for the given value(s).
 
@@ -52,6 +61,7 @@ class Potential(object):
         
         for xi,xf in self.regions:
             if value >= xi and value < xf:
+                #print(xi,",",xf,"\n")
                 function = self.regions[(xi,xf)]
                 if hasattr(function, "__call__"): # If it was a lamda function, call it
                     return function(value) 
@@ -60,7 +70,7 @@ class Potential(object):
         else: # If we didn't return during the loops, then this is the default thing to return
             return 0.
         
-    def __mul__(self, value):
+    def __mul__(self, value): # pragma: no cover
         """Increases the strength of the potential by factor given by `value`.
 
         Args:
@@ -110,6 +120,9 @@ class Potential(object):
             if "numpy" in sfunc:
                 import numpy as np
                 self.params["numpy"] = np
+            if "operator" in sfunc and "operator" not in self.params:
+                import operator
+                self.params["operator"] = operator
             xi, xf = eval(domain, self.params)
             function = eval(sfunc, self.params)
             self.regions[(xi,xf)] = function
