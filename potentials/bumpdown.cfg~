@@ -1,9 +1,0 @@
-[parameters]
-V0=15.
-a=2.
-w=1.
-
-[regions]
-1=-a,-w | V0
-2=-w,w | 0
-3=w,a | V0

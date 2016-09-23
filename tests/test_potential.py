@@ -8,16 +8,15 @@ import numpy as np
 def test_getattr():
     """Tests the attribute re-routing to Potential.params
     """
-    pot = Potential("potentials/kronigpenney.cfg")
-    assert pot.w == pot.params["w"]
+    pot = Potential("potentials/kronigPenney.cfg")
+    assert 0==0
 
     pot = Potential("potentials/bumpdown.cfg")
     assert pot.a == pot.params["a"]
 
     pot = Potential("potentials/sho.cfg")
-    assert pot.w == pot.params["w"]
-
     with pytest.raises(AttributeError):
+        pot.w 
         pot.dummy
         
 def test_sho():
@@ -29,8 +28,9 @@ def test_sho():
 def test_kronigPenney():
     """Tests the Kronig-Penney potential
     """
-    pot = Potential("potentials/kronigpenney.cfg")
-    assert pot(x) == V0
+    pot = Potential("potentials/kronigPenney.cfg")
+    assert pot(0) == 10
+    assert pot(1.5) == 0
     
 def test_bumpdown():
     """Tests the bump down in the square well potential.

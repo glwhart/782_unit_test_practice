@@ -19,6 +19,6 @@ def test_run():
     """Tests that a default solve works properly
     """
     argv = ["py.test", "200", "-potential", "potentials/kronigpenney.cfg"]
-    assert get_sargs(argv) is None
+    args = get_sargs(argv)
     from basis.solve import run
     assert run(args) == 0

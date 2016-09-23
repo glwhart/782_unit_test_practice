@@ -30,15 +30,18 @@ class Potential(object):
         self.parser = None
         self._parse_config()
 
-    def __gatattr__(self, attr):
+    def __getattr__(self, attr):
         #if hasattr(self, attr):
         #    return self.__getattribute__(attr)
         if attr in self.params:
-            return self.params
+            return self.params[attr]
         else:
-            emsg = "{} is not an attribute of Potential objects"
+            for i in self.params:
+                print "PARAMS",i
+            emsg = "<<<<<<<< {} is not an attribute of Potential objects"
             raise AttributeError(emsg.format(attr))
-
+        
+        
     def __call__(self, value):
         """Evaluates the potential for the given value(s).
 
@@ -133,7 +136,7 @@ class Potential(object):
         """
         try:
             from ConfigParser import ConfigParser
-        except ImportError:
+        except ImportError: # pragma: no cover
             from configparser import ConfigParser
 
         self.parser = ConfigParser()
