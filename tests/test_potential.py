@@ -18,13 +18,26 @@ def test_getattr():
     with pytest.raises(AttributeError):
         pot.w 
         pot.dummy
-        
+
+def test_adjust():
+    pot = Potential("potentials/bumpdown.cfg")
+    pot.adjust(shift = 1)
+
+    
 def test_sho():
     """Tests the SHO potential."""
     pot = Potential("potentials/sho.cfg")
 
     assert pot(1.2) == 0.
 
+def test_regions():
+    """Tests for a missing regions section in the config file.
+    """
+    with pytest.raises(ValueError):
+        pot = Potential("potentials/test_regions.cfg")      
+    pot = Potential("potentials/test_numpy_import.cfg")
+        
+        
 def test_kronigPenney():
     """Tests the Kronig-Penney potential
     """

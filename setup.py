@@ -18,7 +18,7 @@ except ImportError:
 
 from os import path
 setup(name='basis',
-      version='0.0.0',
+      version='0.0.2',
       description='Solve particle-in-box and Kronig-Penney type problems with a basis',
       long_description= "" if not path.isfile("README.md") else read_md('README.md'),
       author='Gus L. W. Hart',

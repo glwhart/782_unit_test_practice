@@ -1,6 +1,7 @@
 """Defines a class and methods for evaluating 1D quantum potentials.
 """
 import numpy as np
+from basis import msg
 class Potential(object):
     """ Represents a 1D quantum Potential.
 
@@ -36,8 +37,6 @@ class Potential(object):
         if attr in self.params:
             return self.params[attr]
         else:
-            for i in self.params:
-                print "PARAMS",i
             emsg = "<<<<<<<< {} is not an attribute of Potential objects"
             raise AttributeError(emsg.format(attr))
         
